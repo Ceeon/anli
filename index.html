@@ -93,10 +93,60 @@
         .video {
             width: 100%;
             height: 450px;
-            object-fit: cover;
+            object-fit: contain; /* 改为 contain 以显示完整视频 */
             display: block;
+            background: #000; /* 添加黑色背景填充空白区域 */
         }
 
+        /* 为竖屏视频添加特殊样式 */
+        .video-container.vertical .video {
+            height: 600px; /* 竖屏视频使用更高的容器 */
+            max-width: 400px; /* 限制最大宽度 */
+            margin: 0 auto; /* 居中显示 */
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .video {
+                height: 320px;
+                object-fit: contain; /* 移动端也使用 contain */
+            }
+            
+            .video-container.vertical .video {
+                height: 500px;
+                max-width: 100%;
+            }
+            
+            .play-button {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+                top: 15px;
+                right: 15px;
+            }
+            
+            .chapter {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .video {
+                height: 380px;
+                object-fit: contain; /* 平板端也使用 contain */
+            }
+            
+            .video-container.vertical .video {
+                height: 550px;
+                max-width: 350px;
+                margin: 0 auto;
+            }
+        }
         .play-button {
             position: absolute;
             top: 20px;
@@ -231,11 +281,9 @@
         <div class="chapter">
             <h2 class="chapter-title">第1章：懒散的早晨</h2>
             <div class="video-container">
-                <iframe class="video" id="video1" 
-                        src="https://v3-show.douyinvod.com/e22bc8cca529452ba80bce7349248bff/68436d75/video/tos/cn/tos-cn-v-f01e0d/owwGnBeIjAddQHGE4ICXzylf6eQ2LcroGxBGZ0/?a=1938&ch=0&cr=7&dr=0&lr=video_gen_watermark&cd=0%7C0%7C0%7C1&cv=1&br=351&bt=351&cs=4&ds=3&ft=9eUQ9bBOBBkq8ZmoHfh2-_vjVQWw&mime_type=video_mp4&qs=0&rc=ZzpoNDc7Nmc6OTg3ZzxnOkBpam1zNnY5cnI2MzczNGhlM0BeMV5eXy0zXjAxYmMyNDRfYSNlZm1jMmRzMnFhLS1kMi9zcw%3D%3D&btag=c0000e00008000&dy_q=1748644592&feature_id=572aa366a35594416566c906c0093b22&l=202505310636328B756D72294018916A7D" 
-                        frameborder="0" 
-                        allowfullscreen>
-                </iframe>
+                <video class="video" id="video1" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450'%3E%3Crect width='800' height='450' fill='%23f0f0f0'/%3E%3Ctext x='400' y='225' text-anchor='middle' font-size='24' fill='%23666'%3E第1章视频%3C/text%3E%3C/svg%3E">
+                    <source src="https://pub-b7bc9b496899444eb27193c258b6c096.r2.dev/%E7%94%9F%E6%88%90%E7%9A%84%E8%A7%86%E9%A2%91.mp4" type="video/mp4">
+                </video>
                 <button class="play-button" onclick="togglePlay(1)">▶</button>
                 <audio class="audio" id="audio1">
                     <source src="https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com/audio%2Ftts-mp3-20250531063759-FatWxdrE.mp3?Expires=86401748644679&OSSAccessKeyId=LTAI5tGLnRTkBjLuYPjNcKQ8&Signature=5X%2FPKuYAxyR90CZiohfxdVxEoYw%3D" type="audio/mpeg">
