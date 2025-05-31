@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>李小帅的钢铁侠冒险记</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 漫画风格背景装饰 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                radial-gradient(circle at 40% 60%, rgba(255, 255, 255, 0.05) 3px, transparent 3px);
+            background-size: 50px 50px, 30px 30px, 70px 70px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .chapter {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .chapter:hover {
+            transform: translateY(-5px);
+        }
+
+        .chapter-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .video {
+            width: 100%;
+            height: 450px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .play-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: rgba(52, 152, 219, 0.9);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .play-button:hover {
+            background: rgba(52, 152, 219, 1);
+            transform: scale(1.1);
+        }
+
+        .play-button.playing {
+            background: rgba(231, 76, 60, 0.9);
+        }
+
+        .play-button.playing:hover {
+            background: rgba(231, 76, 60, 1);
+        }
+
+        .story-text {
+            display: none;
+            background: rgba(236, 240, 241, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+            line-height: 1.8;
+            color: #2c3e50;
+        }
+
+        .toggle-text {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .toggle-text:hover {
+            background: #7f8c8d;
+        }
+
+        .audio {
+            display: none;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .video {
+                height: 320px;
+            }
+            
+            .play-button {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+                top: 15px;
+                right: 15px;
+            }
+            
+            .chapter {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .video {
+                height: 380px;
+            }
+        }
+
+        /* 漫画风格装饰元素 */
+        .decoration {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .decoration:nth-child(1) {
+            top: 10%;
+            left: 5%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .decoration:nth-child(2) {
+            top: 60%;
+            right: 5%;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="decoration"></div>
+    <div class="decoration"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1 class="title">李小帅的钢铁侠冒险记</h1>
+            <p class="subtitle">一个关于勇气、友谊和成长的温暖故事</p>
+        </div>
+
+        <!-- 第1章 -->
+        <div class="chapter">
+            <h2 class="chapter-title">第1章：懒散的早晨</h2>
+            <div class="video-container">
+                <video class="video" id="video1" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450'%3E%3Crect width='800' height='450' fill='%23f0f0f0'/%3E%3Ctext x='400' y='225' text-anchor='middle' font-size='24' fill='%23666'%3E第1章视频%3C/text%3E%3C/svg%3E">
+                    <source src="https://v3-show.douyinvod.com/e22bc8cca529452ba80bce7349248bff/68436d75/video/tos/cn/tos-cn-v-f01e0d/owwGnBeIjAddQHGE4ICXzylf6eQ2LcroGxBGZ0/?a=1938&ch=0&cr=7&dr=0&lr=video_gen_watermark&cd=0%7C0%7C0%7C1&cv=1&br=351&bt=351&cs=4&ds=3&ft=9eUQ9bBOBBkq8ZmoHfh2-_vjVQWw&mime_type=video_mp4&qs=0&rc=ZzpoNDc7Nmc6OTg3ZzxnOkBpam1zNnY5cnI2MzczNGhlM0BeMV5eXy0zXjAxYmMyNDRfYSNlZm1jMmRzMnFhLS1kMi9zcw%3D%3D&btag=c0000e00008000&dy_q=1748644592&feature_id=572aa366a35594416566c906c0093b22&l=202505310636328B756D72294018916A7D" type="video/mp4">
+                </video>
+                <button class="play-button" onclick="togglePlay(1)">▶</button>
+                <audio class="audio" id="audio1">
+                    <source src="https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com/audio%2Ftts-mp3-20250531063759-FatWxdrE.mp3?Expires=86401748644679&OSSAccessKeyId=LTAI5tGLnRTkBjLuYPjNcKQ8&Signature=5X%2FPKuYAxyR90CZiohfxdVxEoYw%3D" type="audio/mpeg">
+                </audio>
+            </div>
+            <button class="toggle-text" onclick="toggleText(1)">显示/隐藏故事文本</button>
+            <div class="story-text" id="text1">
+                李小帅是个有点特别的孩子。这天早上，阳光透过窗户洒进他的房间，墙上贴满了钢铁侠的海报，床头柜上放着心爱的钢铁侠模型。但李小帅还是舍不得离开温暖的被窝，他总是喜欢找最舒服的地方休息，能坐着绝不站着，能躺着绝不坐着。<br><br>
+                "小帅，该起床上学了！"妈妈在门口催促着。<br><br>
+                李小帅揉揉眼睛，又在床上赖了十分钟，直到妈妈第三次催促才不情愿地起床。
+            </div>
+        </div>
+
+        <!-- 第2章 -->
+        <div class="chapter">
+            <h2 class="chapter-title">第2章：校园求助</h2>
+            <div class="video-container">
+                <video class="video" id="video2" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450'%3E%3Crect width='800' height='450' fill='%23f0f0f0'/%3E%3Ctext x='400' y='225' text-anchor='middle' font-size='24' fill='%23666'%3E第2章视频%3C/text%3E%3C/svg%3E">
+                    <source src="https://v3-show.douyinvod.com/96b953b763481ecc20cbfa4bb238a874/68436c50/video/tos/cn/tos-cn-v-f01e0d/oYg8BiQqIq0EZ1acEA6UBhimvHbaMAfRwRJgjd/?a=1938&ch=0&cr=7&dr=0&lr=video_gen_watermark&cd=0%7C0%7C0%7C1&cv=1&br=466&bt=466&cs=4&ds=3&ft=9eUQ9bBOBBkq8ZmoRrh2-_vjVQWw&mime_type=video_mp4&qs=0&rc=NGk3OWU2ZjxkO2Q2PGloaEBpajQ8ZWo5cmg2MzczNGhlM0AyXzE0LzVhNl8xXy4zYWA0YSNhZnFpMmRzMHFhLS1kMi9zcw%3D%3D&btag=c0000e00008000&dy_q=1748644299&feature_id=572aa366a35594416566c906c0093b22&l=202505310631393406AC9D0B70188E27FF" type="video/mp4">
+                </video>
+                <button class="play-button" onclick="togglePlay(2)">▶</button>
+                <audio class="audio" id="audio2">
+                    <source src="https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com/audio%2Ftts-mp3-20250531063808-cenrXACn.mp3?Expires=86401748644688&OSSAccessKeyId=LTAI5tGLnRTkBjLuYPjNcKQ8&Signature=EKRuPXFB6zNTGO6ROGksZHTJ068%3D" type="audio/mpeg">
+                </audio>
+            </div>
+            <button class="toggle-text" onclick="toggleText(2)">显示/隐藏故事文本</button>
+            <div class="story-text" id="text2">
+                到了学校，李小帅刚想靠着走廊的墙壁休息一会儿，就看到同学小明遇到了麻烦。小明的书包带子突然断了，书本、文具撒了一地，小明急得快要哭了。<br><br>
+                虽然李小帅很想继续休息，但看到同学需要帮助，他的内心涌起一股暖流。"我来帮你！"李小帅立刻放下自己的背包，毫不犹豫地蹲下来帮小明收拾散落的书本。
+            </div>
+        </div>
+
+        <!-- 第3章 -->
+        <div class="chapter">
+            <h2 class="chapter-title">第3章：神秘光芒</h2>
+            <div class="video-container">
+                <video class="video" id="video3" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450'%3E%3Crect width='800' height='450' fill='%23f0f0f0'/%3E%3Ctext x='400' y='225' text-anchor='middle' font-size='24' fill='%23666'%3E第3章视频%3C/text%3E%3C/svg%3E">
+                    <source src="https://v3-show.douyinvod.com/2a9dbfceef2ac6817fe5813b59df97d7/68436c24/video/tos/cn/tos-cn-v-f01e0d/oYigYxa3EMehiIvaioJgxIEB6QchDFVAq3P3S6/?a=1938&ch=0&cr=7&dr=0&lr=video_gen_watermark&cd=0%7C0%7C0%7C1&cv=1&br=460&bt=460&cs=4&ds=3&ft=9eUQ9bBOBBkq8Zmoyxh2-_vjVQWw&mime_type=video_mp4&qs=0&rc=Ozw0ZzRoZzU2ZmdnM2Q7OEBpMzQ0d3Q5cjs2MzczNGhlM0A2Mi5hNl40Nl8xLWIwMGMvYSNpX29rMmQ0L3FhLS1kMjBzcw%3D%3D&btag=80000e00008000&dy_q=1748644255&feature_id=572aa366a35594416566c906c0093b22&l=202505310630557D7A1B7593676B06DFC7" type="video/mp4">
+                </video>
+                <button class="play-button" onclick="togglePlay(3)">▶</button>
+                <audio class="audio" id="audio3">
+                    <source src="https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com/audio%2Ftts-mp3-20250531063823-dFUNMUEQ.mp3?Expires=86401748644703&OSSAccessKeyId=LTAI5tGLnRTkBjLuYPjNcKQ8&Signature=3awl8sBRCUGX0zahyP3T%2FrCIKno%3D" type="audio/mpeg">
+                </audio>
+            </div>
+            <button class="toggle-text" onclick="toggleText(3)">显示/隐藏故事文本</button>
+            <div class="story-text" id="text3">
+                就在李小帅专心帮助小明收拾书本的时候，奇迹发生了！他的胸前突然发出了蓝色的光芒，就像钢铁侠托尼·斯塔克胸前的反应堆一样闪闪发光！<br><br>
+                周围的同学都惊讶地停下脚步，目瞪口呆地看着这道神奇的光芒。李小帅自己也震惊得说不出话来，他低头看着胸前的光芒，感受到一股前所未有的力量在体内涌动。
+            </div>
+        </div>
+
+        <!-- 第4章 -->
+        <div class="chapter">
+            <h2 class="chapter-title">第4章：力量觉醒</h2>
+            <div class="video-container">
+                <video class="video" id="video4" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450'%3E%3Crect width='800' height='450' fill='%23f0f0f0'/%3E%3Ctext x='400' y='225' text-anchor='middle' font-size='24' fill='%23666'%3E第4章视频%3C/text%3E%3C/svg%3E">
+                    <source src="https://v26-show.douyinvod.com/6c40796a244dc841c40c86cba80adcdc/68436aee/video/tos/cn/tos-cn-v-f01e0d/o85BBFAbDbbfYeOXGouMSpD651I1E2GwDjMnEg/?a=1938&ch=0&cr=7&dr=0&lr=video_gen_watermark&cd=0%7C0%7C0%7C1&cv=1&br=391&bt=391&cs=4&ds=3&ft=9eUQ9bBOBBkq8ZmoVJh2-_vjVQWw&mime_type=video_mp4&qs=0&rc=ZjM1Ozs1M2k3Omc1ZzkzZEBpajozcHg5cnA2MzczNGhlM0A2NF5fXzIzNjAxY2NfY19iYSNoYXJfMmRzLXFhLS1kMjBzcw%3D%3D&btag=c0000e00008000&dy_q=1748643945&feature_id=572aa366a35594416566c906c0093b22&l=20250531062545C4D2B4BD2860DF77BD41" type="video/mp4">
+                </video>
+                <button class="play-button" onclick="togglePlay(4)">▶</button>
+                <audio class="audio" id="audio4">
+                    <source src="https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com/audio%2Ftts-mp3-20250531063831-vJfAPWrc.mp3?Expires=86401748644711&OSSAccessKeyId=LTAI5tGLnRTkBjLuYPjNcKQ8&Signature=dvQHZcA7dxJOKXlYUEQ3tt%2BnvB0%3D" type="audio/mpeg">
+                </audio>
+            </div>
+            <button class="toggle-text" onclick="toggleText(4)">显示/隐藏故事文本</button>
+            <div class="story-text" id="text4">
+                李小帅发现自己竟然可以像钢铁侠一样飞行！不过，由于他天生有点懒的性格，飞行姿势显得有些笨拙和随意，他并不想用太多力气，而是以最省力的方式在空中漂浮着。<br><br>
+                学校操场上的同学们都仰着头，惊奇地看着在空中飞行的李小帅。"哇！李小帅会飞了！"同学们兴奋地喊着。
+            </div>
+        </div>
+
+        <!-- 第5章 -->
+        <div class="chapter">
+            <h2 class="chapter-title">第5章：城市危机</h2>
+            <div class="video-container">
+                <video class="video" id="video5" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450'%3E%3Crect width='800' height='450' fill='%23f0f0f0'/%3E%3Ctext x='400' y='225' text-anchor='middle' font-size='24' fill='%23666'%3E第5章视频%3C/text%3E%3C/svg%3E">
+                    <source src="https://v3-show.douyinvod.com/afe8073d32d3f584bc866b63ec6c47bc/68436994/video/tos/cn/tos-cn-v-f01e0d/oEDXSsL6HQGxfhKLvIfBeFIZg6Irm1eCIzwLLE/?a=1938&ch=0&cr=7&dr=0&lr=video_gen_watermark&cd=0%7C0%7C0%7C1&cv=1&br=548&bt=548&cs=4&ds=3&ft=9eUQ9bBOBBkq8Zmog_w2-_vjVQWw&mime_type=video_mp4&qs=0&rc=OGdoaWhmNTRkNjNkNTw0M0BpMzZ2N3I5cnk1MzczNGhlM0AtMS02L15eXjIxLS0uNjQ1YSNmZl9fMmRzcXFhLS1kMi9zcw%3D%3D&btag=c0000e00008000&dy_q=1748643599&feature_id=572aa366a35594416566c906c0093b22&l=202505310619592392C2B958E3497487E2" type="video/mp4">
+                </video>
+                <button class="play-button" onclick="togglePlay(5)">▶</button>
+                <audio class="audio" id="audio5">
+                    <source src="https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com/audio%2Ftts-mp3-20250531063843-vFSZuHpE.mp3?Expires=86401748644723&OSSAccessKeyId=LTAI5tGLnRTkBjLuYPjNcKQ8&Signature=R%2FEIk%2BwtWWjenRaez4CAgOIqeBE%3D" type="audio/mpeg">
+                </audio>
+            </div>
+            <button class="toggle-text" onclick="toggleText(5)">显示/隐藏故事文本</button>
+            <div class="story-text" id="text5">
+                正当李小帅还在适应自己的新能力时，城市上空突然出现了一个巨大的机器怪兽！这个怪兽有着钢铁般的身躯和闪烁的红色眼睛，正在无情地破坏着城市的建筑物。<br><br>
+                李小帅站在学校屋顶上，看着远处的破坏场面。虽然他很想继续在阴凉的地方休息，但想到城市里有那么多需要帮助的人，他的心开始纠结起来。
+            </div>
+        </div>
+
+        <!-- 第6章 -->
+        <div class="chapter">
+            <h2 class="chapter-title">第6章：内心挣扎</h2>
+            <div class="video-container">
+                <video class="video" id="video6" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450'%3E%3Crect width='800' height='450' fill='%23f0f0f0'/%3E%3Ctext x='400' y='225' text-anchor='middle' font-size='24' fill='%23666'%3E第6章视频%3C/text%3E%3C/svg%3E">
+                    <source src="https://v3-show.douyinvod.com/f2aeaa7f669dc54fea56b8303134a419/68436952/video/tos/cn/tos-cn-v-f01e0d/oA1dDf3frE8EEsLfBDQAFCm6IBzFl5u9IBqS5V/?a=1938&ch=0&cr=7&dr=0&lr=video_gen_watermark&cd=0%7C0%7C0%7C1&cv=1&br=334&bt=334&cs=4&ds=3&ft=9eUQ9bBOBBkq8Zmontw2-_vjVQWw&mime_type=video_mp4&qs=0&rc=OWc3Omk5OzhnNmg5Ojk8aEBpanltZnU5cmk1MzczNGhlM0AyXzMvMzMyNWAxNmM2LjAwYSNyYm9kMmRzcXFhLS1kMi9zcw%3D%3D&btag=80000e00008000&dy_q=1748643533&feature_id=572aa366a35594416566c906c0093b22&l=202505310618533C31E3A4FBC663FAD5E2" type="video/mp4">
+                </video>
+                <button class="play-button" onclick="togglePlay(6)">▶</button>
+                <audio class="audio" id="audio6">
+                    <source src="https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com/audio%2Ftts-mp3-20250531063851-ALtCiwoo.mp3?Expires=86401748644731&OSSAccessKeyId=LTAI5tGLnRTkBjLuYPjNcKQ8&Signature=LxQ42EAzn%2BqC5upQZ1uvpNmuFPc%3D" type="audio/mpeg">
+                </audio>
+            </div>
+            <button class="toggle-text" onclick="toggleText(6)">显示/隐藏故事文本</button>
+            <div class="story-text" id="text6">
+                李小帅坐在屋顶的边缘，陷入了深深的思考。一边是舒适的阴凉处，那里代表着他最喜欢的懒散时光；另一边是需要拯救的城市，那里有无数需要帮助的人们。<br><br>
+                他的表情显示出内心的激烈斗争："我真的很想休息，但是...那些人需要帮助。"李小帅想起了所有曾经帮助过的同学，想起了他们感激的笑容。
+            </div>
+        </div>
+
+        <!-- 第7章 -->
+        <div class="chapter">
+            <h2 class="chapter-title">第7章：决心出击</h2>
+            <div class="video-container">
+                <video class="video" id="video7" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450'%3E%3Crect width='800' height='450' fill='%23f0f0f0'/%3E%3Ctext x='400' y='225' text-anchor='middle' font-size='24' fill='%23666'%3E第7章视频%3C/text%3E%3C/svg%3E">
+                    <source src="https://v9-show.douyinvod.com/fe0068c7a912daa86ae571c956b7d474/68436899/video/tos/cn/tos-cn-v-f01e0d/oA8AciAIEuDfs6HEh0HkJbh68lIaEJtRBRLhiQ/?a=1938&ch=0&cr=7&dr=0&lr=video_gen_watermark&cd=0%7C0%7C0%7C1&cv=1&br=421&bt=421&cs=4&ds=3&ft=9eUQ9bBOBBkq8Zmo65w2-_vjVQWw&mime_type=video_mp4&qs=0&rc=Ojc4ZGk6OWQ5NjhoZTo5ZUBpajQ5ZXQ5cjQ1MzczNGhlM0A1YDM2NS4vXi8xNS1jXy1iYSNhb2YvMmRzcHFhLS1kMi9zcw%3D%3D&btag=c0000e00008000&dy_q=1748643348&feature_id=572aa366a35594416566c906c0093b22&l=202505310615489B96C14744C8794329FF" type="video/mp4">
+                </video>
+                <button class="play-button" onclick="togglePlay(7)">▶</button>
+                <audio class="audio" id="audio7">
+                    <source src="https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com/audio%2Ftts-mp3-20250531063900-pPdzpyom.mp3?Expires=86401748644740&OSSAccessKeyId=LTAI5tGLnRTkBjLuYPjNcKQ8&Signature=Xpd7Fg%2F1tv6oCNF5dNf842D5m6E%3D" type="audio/mpeg">
+                </audio>
+            </div>
+            <button class="toggle-text" onclick="toggleText(7)">显示/隐藏故事文本</button>
+            <div class="story-text" id="text7">
+                "好吧，"李小帅深深地叹了口气，"看来又要忙起来了。"当他想起所有需要帮助的同学和市民时，眼神变得坚定起来。<br><br>
+                他站起身，胸前的蓝色光芒变得更加明亮，整个人散发出英雄的气质。虽然还是有点不情愿离开舒适的地方，但责任感让他做出了正确的选择。
+            </div>
+        </div>
+
+        <!-- 第8章 -->
+        <div class="chapter">
+            <h2 class="chapter-title">第8章：智慧战斗</h2>
+            <div class="video-container">
+                <video class="video" id="video8" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450'%3E%3Crect width='800' height='450' fill='%23f0f0f0'/%3E%3Ctext x='400' y='225' text-anchor='middle' font-size='24' fill='%23666'%3E第8章视频%3C/text%3E%3C/svg%3E">
+                    <source src="https://v26-show.douyinvod.com/65689cc3d7fe1d93962e86523f14b136/68436739/video/tos/cn/tos-cn-v-f01e0d/ooss1JPYhDELqLeYapQtI0iiEHN2Da6LB8goAt/?a=1938&ch=0&cr=7&dr=0&lr=video_gen_watermark&cd=0%7C0%7C0%7C1&cv=1&br=1137&bt=1137&cs=4&ds=3&ft=9eUQ9bBOBBkq8Zmoaew2-_vjVQWw&mime_type=video_mp4&qs=0&rc=M2U2OztoNWlpZ2VpN2U8M0BpM3BxOW85cjw1MzczNGhlM0AwYDMyMjYyX2ExYzEzXjFgYSNpNjJqMmQ0bXFhLS1kMjBzcw%3D%3D&btag=80000e00008000&dy_q=1748642996&feature_id=572aa366a35594416566c906c0093b22&l=20250531060956664AF79805DB9AEAE657" type="video/mp4">
+                </video>
+                <button class="play-button" onclick="togglePlay(8)">▶</button>
+                <audio class="audio" id="audio8">
+                    <source src="https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com/audio%2Ftts-mp3-20250531064312-pjmdPmza.mp3?Expires=86401748644992&OSSAccessKeyId=LTAI5tGLnRTkBjLuYPjNcKQ8&Signature=F0x89%2BBbkFY1ReV12Zu3Q0kHNpw%3D" type="audio/mpeg">
+                </audio>
+            </div>
+            <button class="toggle-text" onclick="toggleText(8)">显示/隐藏故事文本</button>
+            <div class="story-text" id="text8">
+                李小帅并没有像传统超级英雄那样直接冲向怪兽进行激烈的战斗。相反，他发挥了自己"懒"的优势——用最省力、最聪明的方式来解决问题。<br><br>
+                他仔细观察怪兽，发现它的能量核心在背部，但那个位置很难直接攻击到。"与其硬碰硬，不如想个巧妙的办法。"李小帅露出了聪明的笑容。
+            </div>
+        </div>
+
+        <!-- 第9章 -->
+        <div class="chapter">
+            <h2 class="chapter-title">第9章：团队合作</h2>
+            <div class="video-container">
+                <video class="video" id="video9" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450'%3E%3Crect width='800' height='450' fill='%23f0f0f0'/%3E%3Ctext x='400' y='225' text-anchor='middle' font-size='24' fill='%23666'%3E第9章视频%3C/text%3E%3C/svg%3E">
+                    <source src="https://v26-show.douyinvod.com/cb5a3a58de7d0a7ddf0784b9bfcc31bb/68436600/video/tos/cn/tos-cn-v-f01e0d/ogE5y4I065b4qyDoBgfmFCSDbtQpuselAiOoV1/?a=1938&ch=0&cr=7&dr=0&lr=video_gen_watermark&cd=0%7C0%7C0%7C1&cv=1&br=1406&bt=1406&cs=4&ds=3&ft=9eUQ9bBOBBkq8ZmoXUw2-_vjVQWw&mime_type=video_mp4&qs=0&rc=ZWZkZjtlNDpkZTRmPGQ7OkBpam44cXc5cnM1MzczNGhlM0BeMmJgY2EwNS0xYzYwMDM1YSNtNTAtMmRjanFhLS1kMjBzcw%3D%3D&btag=c0000e00008000&dy_q=1748642683&feature_id=572aa366a35594416566c906c0093b22&l=20250531060443ECDD560B47B0D896EF6C" type="video/mp4">
+                </video>
+                <button class="play-button" onclick="togglePlay(9)">▶</button>
+                <audio class="audio" id="audio9">
+                    <source src="https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com/audio%2Ftts-mp3-20250531064321-dVKhTNZJ.mp3?Expires=86401748645001&OSSAccessKeyId=LTAI5tGLnRTkBjLuYPjNcKQ8&Signature=pjAduevgbJ7ycqWOaSjIIJwNA9A%3D" type="audio/mpeg">
+                </audio>
+            </div>
+            <button class="toggle-text" onclick="toggleText(9)">显示/隐藏故事文本</button>
+            <div class="story-text" id="text9">
+                "同学们，我需要你们的帮助！"李小帅通过心灵感应联系了所有的同学。他没有选择单打独斗，而是发挥了自己最大的优势——团结大家，让每个人都能发挥作用。<br><br>
+                "小红，你的声音最响亮，帮我吸引怪兽的注意；小刚，你跑得最快，帮我传递信息；小丽，你最细心，帮我观察怪兽的动作规律。"在李小帅的空中指挥下，同学们在地面上完美配合。
+            </div>
+        </div>
+
+        <!-- 第10章 -->
+        <div class="chapter">
+            <h2 class="chapter-title">第10章：英雄归来</h2>
+            <div class="video-container">
+                <video class="video" id="video10" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 450'%3E%3Crect width='800' height='450' fill='%23f0f0f0'/%3E%3Ctext x='400' y='225' text-anchor='middle' font-size='24' fill='%23666'%3E第10章视频%3C/text%3E%3C/svg%3E">
+                    <source src="https://v9-show.douyinvod.com/08d0f1e1c1f174d84f2892934888b835/68436253/video/tos/cn/tos-cn-v-f01e0d/oMNFgrC7QpzE8ef92fnZ6IEpQ8bJuDyadaEAlB/?a=1938&ch=0&cr=7&dr=0&lr=video_gen_watermark&cd=0%7C0%7C0%7C1&cv=1&br=1369&bt=1369&cs=4&ds=3&ft=9eUQ9bBOBBkq8ZmoPqw2-_vjVQWw&mime_type=video_mp4&qs=0&rc=NjU4aGVmOjlnZjU4ZzxkZUBpMzltZ205cmk1MzczNGhlM0A0MGE0YDZjNjMxMl5fLS1gYSNsb25qMmRjY3FhLS1kMi9zcw%3D%3D&btag=80000e00008000&dy_q=1748641742&feature_id=572aa366a35594416566c906c0093b22&l=202505310549027D58A1349B3691EF5CF7" type="video/mp4">
+                </video>
+                <button class="play-button" onclick="togglePlay(10)">▶</button>
+                <audio class="audio" id="audio10">
+                    <source src="https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com/audio%2Ftts-mp3-20250531064330-FYaBzalI.mp3?Expires=86401748645010&OSSAccessKeyId=LTAI5tGLnRTkBjLuYPjNcKQ8&Signature=iyZl1%2BqUcPISBD%2F7PuA9AIpvgRA%3D" type="audio/mpeg">
+                </audio>
+            </div>
+            <button class="toggle-text" onclick="toggleText(10)">显示/隐藏故事文本</button>
+            <div class="story-text" id="text10">
+                在大家的团队合作下，李小帅用最少的力气、最巧妙的方法成功击败了机器怪兽。城市恢复了和平，建筑物重新变得完好如初。<br><br>
+                当李小帅回到学校时，同学们都围着他欢呼："李小帅，你真是我们的英雄！"<br><br>
+                李小帅挠挠头，虽然累得想找个地方休息，但脸上带着满足的笑容："其实我还是想找个地方休息一下，不过...能帮助大家，感觉还挺不错的。"
+            </div>
+        </div>
+
+        <!-- 故事寓意 -->
+        <div class="chapter">
+            <h2 class="chapter-title">故事寓意</h2>
+            <div class="story-text" style="display: block; background: rgba(255, 255, 255, 0.9); border: 2px solid #3498db;">
+                从那以后，李小帅成了学校里的小领袖。他依然有点懒，依然喜欢找舒服的地方休息，但每当有人需要帮助时，他总是能想出最聪明、最省力的解决方案，带领大家一起克服困难。<br><br>
+                因为真正的英雄，不是要多么强大，而是要有一颗愿意帮助别人的心。就像钢铁侠托尼·斯塔克一样，用智慧和团队合作来拯救世界。<br><br>
+                每个孩子都有自己独特的特点，即使是"懒惰"这样看似缺点的特质，也能转化为"高效"和"聪明"的优势。重要的是保持一颗善良的心，愿意帮助别人，这样就能成为真正的英雄。
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePlay(chapterNum) {
+            const video = document.getElementById(`video${chapterNum}`);
+            const audio = document.getElementById(`audio${chapterNum}`);
+            const button = document.querySelector(`#video${chapterNum}`).nextElementSibling;
+            
+            // 停止所有其他视频和音频
+            for (let i = 1; i <= 10; i++) {
+                if (i !== chapterNum) {
+                    const otherVideo = document.getElementById(`video${i}`);
+                    const otherAudio = document.getElementById(`audio${i}`);
+                    const otherButton = document.querySelector(`#video${i}`).nextElementSibling;
+                    
+                    if (otherVideo && !otherVideo.paused) {
+                        otherVideo.pause();
+                        otherAudio.pause();
+                        otherButton.innerHTML = '▶';
+                        otherButton.classList.remove('playing');
+                    }
+                }
+            }
+            
+            if (video.paused) {
+                video.play();
+                audio.play();
+                button.innerHTML = '⏸';
+                button.classList.add('playing');
+                
+                // 同步播放
+                video.addEventListener('timeupdate', function() {
+                    if (Math.abs(video.currentTime - audio.currentTime) > 0.3) {
+                        audio.currentTime = video.currentTime;
+                    }
+                });
+                
+                // 播放结束时重置按钮
+                video.addEventListener('ended', function() {
+                    button.innerHTML = '▶';
+                    button.classList.remove('playing');
+                });
+                
+            } else {
+                video.pause();
+                audio.pause();
+                button.innerHTML = '▶';
+                button.classList.remove('playing');
+            }
+        }
+        
+        function toggleText(chapterNum) {
+            const textElement = document.getElementById(`text${chapterNum}`);
+            if (textElement.style.display === 'none' || textElement.style.display === '') {
+                textElement.style.display = 'block';
+            } else {
+                textElement.style.display = 'none';
+            }
+        }
+        
+        // 错误处理
+        document.addEventListener('DOMContentLoaded', function() {
+            const videos = document.querySelectorAll('video');
+            const audios = document.querySelectorAll('audio');
+            
+            videos.forEach(video => {
+                video.addEventListener('error', function() {
+                    console.log('视频加载失败:', video.src);
+                });
+            });
+            
+            audios.forEach(audio => {
+                audio.addEventListener('error', function() {
+                    console.log('音频加载失败:', audio.src);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
